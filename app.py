@@ -538,6 +538,7 @@ def _overlap_wide_export(long_df: pd.DataFrame) -> pd.DataFrame:
             columns="comparison",
             values=value_col,
             aggfunc="first",
+            observed=True,
         )
         part = part.add_prefix(f"{prefix}__")
         pieces.append(part)

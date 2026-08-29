@@ -118,8 +118,13 @@ def gene_sets_for_comparisons(df: pd.DataFrame, comparison_ids: list[str]) -> di
     if filtered.empty:
         return {comp: set() for comp in comparison_ids}
 
-    grouped = filtered.groupby("comparison_id")["feature_name"].agg(
-        lambda values: set(values.astype(str).tolist())
+    # feature_name is category dtype; aggregating it into a set() per group
+    # makes pandas try to cast the result back to Categorical, which raises.
+    # Casting to plain str first avoids that.
+    grouped = (
+        filtered.assign(feature_name=filtered["feature_name"].astype(str))
+        .groupby("comparison_id", observed=True)["feature_name"]
+        .agg(lambda values: set(values.tolist()))
     )
     return {comp: grouped.get(comp, set()) for comp in comparison_ids}
 
@@ -132,7 +137,7 @@ def intersection_summary(df: pd.DataFrame, comparison_ids: list[str]) -> pd.Data
     if subset.empty:
         return pd.DataFrame(columns=["intersection", "n_genes", "best_adj_pval"])
 
-    grouped = subset.groupby("feature_name")
+    grouped = subset.groupby("feature_name", observed=True)
     rows = []
     for gene, block in grouped:
         comps = sorted(block["comparison_id"].astype(str).unique().tolist())
@@ -170,7 +175,7 @@ def genes_in_intersection(df: pd.DataFrame, intersection_label: str) -> pd.DataF
     if subset.empty:
         return pd.DataFrame(columns=["gene", "n_comparisons", "best_adj_pval"])
 
-    grouped = subset.groupby("feature_name")
+    grouped = subset.groupby("feature_name", observed=True)
     rows = []
     for gene, block in grouped:
         comps = sorted(block["comparison_id"].astype(str).unique().tolist())
