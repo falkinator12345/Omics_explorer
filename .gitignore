@@ -1,0 +1,15 @@
+.DS_Store
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# Local environments
+.venv/
+
+# Data and generated outputs (excluded from git push)
+*.xlsx
+# Raw proteomics .rds sources stay local-only; the app runs on the
+# checked-in *_expression_cache.csv files instead
+*.rds
+# Streamlit caches
+.streamlit/

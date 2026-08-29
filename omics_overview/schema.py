@@ -1,0 +1,90 @@
+from __future__ import annotations
+
+from typing import Dict, List
+
+REQUIRED_COLUMNS: List[str] = [
+    "feature_name",
+    "accession",
+    "comparison_id",
+    "group_a",
+    "group_b",
+    "log2fc_or_fc",
+    "p_value",
+    "p_adj",
+    "direction",
+    "avg_value",
+    "median_value",
+    "source_dataset",
+    "source_file",
+    "modality",
+    "sample_class",
+    "input_kind",
+    "celltype_label",
+    "manual_ct_lvl",
+]
+
+COLUMN_ALIASES: Dict[str, List[str]] = {
+    "feature_name": [
+        "feature_name",
+        "feature",
+        "gene",
+        "gene_name",
+        "genes",
+        "names",
+        "symbol",
+        "protein",
+        "protein_name",
+        "uniprot",
+        "target",
+    ],
+    "accession": [
+        "accession",
+        "accession_id",
+        "protein_id",
+        "uniprot_id",
+        "ensembl",
+        "ensembl_id",
+        "gene_id",
+        "id",
+    ],
+    "log2fc_or_fc": [
+        "log2fc",
+        "logfc",
+        "fc",
+        "fold_change",
+        "foldchange",
+        "ratio",
+        "estimate",
+    ],
+    "p_value": ["p_value", "pvalue", "p.val", "p", "pvalue_raw"],
+    "p_adj": [
+        "p_adj",
+        "padj",
+        "pvals_adj",
+        "adj_p",
+        "adj_p_value",
+        "qvalue",
+        "fdr",
+        "benjamini",
+    ],
+    "direction": ["direction", "regulation", "change", "trend"],
+    "avg_value": [
+        "avg_value",
+        "mean",
+        "logexprs",
+        "mean_expr",
+        "avg_expr",
+        "average",
+        "abundance_mean",
+    ],
+    "median_value": [
+        "median_value",
+        "median",
+        "median_expr",
+        "abundance_median",
+    ],
+    "group_a": ["group_a", "condition_a", "sample_a", "left", "case"],
+    "group_b": ["group_b", "condition_b", "sample_b", "right", "control"],
+}
+
+VALID_MODALITIES = {"proteomics", "transcriptomics", "bulk_rnaseq"}

@@ -1,0 +1,9 @@
+pandas>=2.2
+numpy>=1.26
+openpyxl>=3.1
+pyarrow>=16.0
+matplotlib>=3.8
+matplotlib-venn>=1.1
+upsetplot>=0.9
+pyreadr>=0.5
+streamlit>=1.37

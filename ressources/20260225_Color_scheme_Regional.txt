@@ -1,0 +1,68 @@
+batch = {
+		'Regional':"#BBDF27FF",
+		'HFD' : "#414487FF",
+
+}
+
+diet =  {
+	'CD' : '#BBDF27FF',
+	'HFDL': '#1E9C89FF',
+	'HFDO':  '#482576FF', 
+}
+
+segment = {
+	'Duodenum': "#33cce0" ,
+	'Jejunum': "#D10EE6",
+	'Ileum': "#c6c90c",
+	'Colon': "#ffb20c",
+}
+
+sample = {
+	'Duodenum': "#33cce0",
+	'Jejunum': "#D10EE6",
+	'CD_Jejunum': "#83568b",
+	'Ileum': "#c6c90c",
+	'Colon': "#ffb20c",
+	'CD_Colon' : "#df5f23"
+}
+
+Manual_CT_lvl0 = {
+	"Epithelial" : '#FFCC0C',
+	'Sub-epithelial' : '#F20C81'
+}
+
+Manual_CT_lvl1 = {
+	'Stem and Progenitor' : '#4c750a' ,
+	'Absorptive': '#FFCC0C',
+	'Secretory': '#7e612b',
+	'Mesenchymal' : '#F20C81',
+	'Immune': '#a12a88',
+}
+
+Manual_CT_lvl2 = {
+	'LGR5+ Intestinal Stem Cells': '#3c5f04' ,
+	'TA Progenitor Cells': '#7aaa2c' ,
+	'Enterocytes':	'#FFCC0C',
+	'BEST4+ Enterocytes': '#c07300', 
+	'Goblet Cells': '#7e612b',
+	'Brunner Cells': '#573800',
+	'Enteroendocrine Cells': '#c48663',
+	'Tuft Cells': '#d3664b',
+	'Microfold Cells': '#ff9f84', 
+	'Brunner Cells': '#d7da0a' , 
+
+	
+	'Fibroblasts' : '#f7218f',
+	'Neuronal Cells': '#571fb3',
+	'Vascular Cells': '#3185d3',
+	'Mast Cells' : '#510cf2',
+	'Macrophages' : '#f20c32',
+	'B Cells': '#a12a88',
+	'T Cells': '#5c144c',
+
+
+
+
+}
+
+
