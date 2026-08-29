@@ -11,7 +11,20 @@ from omics_overview.visualize import load_aggregated_expression
 
 
 def load_significance_table(parquet_path: str | Path) -> pd.DataFrame:
-    return pd.read_parquet(parquet_path)
+    df = pd.read_parquet(parquet_path)
+
+    # This table is long-format with millions of rows but only a handful of
+    # distinct values in most string columns (e.g. 325 comparisons, 4 cell
+    # type levels). Category dtype cuts memory ~25x (3.7GB -> ~150MB) with no
+    # data loss. log2fc/avg/median are downcast too; p_value/p_adj stay
+    # float64 since some adjusted p-values underflow float32 to exactly 0.
+    for col in df.select_dtypes(include=["object", "string"]).columns:
+        df[col] = df[col].astype("category")
+    for col in ("log2fc_or_fc", "avg_value", "median_value"):
+        if col in df.columns and df[col].dtype == "float64":
+            df[col] = df[col].astype("float32")
+
+    return df
 
 
 def parse_gene_text(text: str) -> list[str]:
