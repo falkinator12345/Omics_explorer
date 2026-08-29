@@ -556,8 +556,8 @@ def _render_plotting_page(sig_df: pd.DataFrame) -> None:
             """
             The plotting page uses the raw values returned by the data loaders: SCT-normalized
             snRNAseq means from the aggregated expression table and proteomics assay intensities
-            extracted from the RDS files. Those values are already normalized within their own
-            pipelines, but they are not on the same scale across datasets.
+            from the cached expression tables. Those values are already normalized within their
+            own pipelines, but they are not on the same scale across datasets.
 
             Z-scoring is applied only after the selected expression frames are assembled, and it is
             done independently within each `dataset_label`. That means each dataset is centered to
@@ -864,6 +864,38 @@ def _render_overlap_page(sig_df: pd.DataFrame) -> None:
         st.success("Gene set saved. Open page '3. Plotting'.")
 
 
+def _render_about_page() -> None:
+    st.markdown(
+        """
+        This app explores integrated significant-hit tables from several pig gut multi-omics
+        datasets side by side: regional and high-fat-diet (HFD) snRNAseq pseudobulk differential
+        expression, and ECM / soluble / villus proteomics comparisons. All results are normalized
+        into one common long-format table (gene, comparison, direction, fold change, p-value,
+        modality, cell type) so they can be queried and compared together, without needing to
+        touch the original per-pipeline outputs.
+        """
+    )
+    st.markdown("**What you can do, page by page:**")
+    st.markdown(
+        """
+        - **1. Gene Query** — look up one or more genes and see every significant hit for them
+          across all datasets and comparisons, with a CSV download.
+        - **2. Compare Significant Hits** — pick comparisons across proteomics and
+          transcriptomics datasets and see how their significant gene sets overlap, as an
+          UpSet-style intersection plot.
+        - **3. Plotting** — visualize expression of a gene set (from the overlap selection or
+          typed manually) as dotplots or heatmaps across datasets and cell types, z-scored per
+          dataset so differently-scaled analyses stay visually comparable.
+        """
+    )
+    st.caption(
+        "Data provenance: pseudobulk edgeR differential expression on CellBender-corrected "
+        "snRNAseq counts, and log2 intensity proteomics from SummarizedExperiment objects, "
+        "consolidated into one significant-findings table. See methods_webapp_paragraph.md in "
+        "the repository for full methodological detail."
+    )
+
+
 def _render_query_page(sig_df: pd.DataFrame) -> None:
     st.header("1. Gene / Gene-List Query")
     text = st.text_area("Enter one or more genes (comma or newline separated)", "LGR5")
@@ -907,7 +939,7 @@ def _render_query_page(sig_df: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    st.title("Local Multi-Omics Explorer")
+    st.title("Multi-Omics Explorer")
 
     if not PARQUET_PATH.exists():
         st.error(
@@ -916,16 +948,21 @@ def main() -> None:
         )
         return
 
-    sig_df = _load_significance(str(PARQUET_PATH))
-
     page = st.sidebar.radio(
         "Navigate",
         [
+            "About",
             "1. Gene Query",
             "2. Compare Significant Hits",
             "3. Plotting",
         ],
     )
+
+    if page == "About":
+        _render_about_page()
+        return
+
+    sig_df = _load_significance(str(PARQUET_PATH))
 
     st.sidebar.caption(f"Rows: {len(sig_df):,}")
     st.sidebar.caption(f"Comparisons: {sig_df['comparison_id'].nunique():,}")
