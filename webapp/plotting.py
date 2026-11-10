@@ -22,25 +22,45 @@ from webapp.colors import (
 
 COLOR_SCHEME = load_color_scheme()
 
-# Streamlit rasterizes matplotlib figures to a fixed 200 dpi PNG before
-# stretching them to the container width (see st.pyplot's internal
-# marshall()). A hardcoded dpi looks soft on wide/high-DPI screens for our
-# narrower figures and wastes memory upscaling dpi on our widest ones, so we
-# pick a dpi per-figure that targets a roughly constant rendered pixel width
-# instead of a constant dpi.
+# Streamlit rasterizes matplotlib figures to a PNG and, when width="stretch"
+# is used, silently downscales any image wider than MAXIMUM_CONTENT_WIDTH
+# (2 * 730 = 1460px, see streamlit.elements.lib.image_utils) before sending it
+# to the browser - no dpi we pick survives that. The browser then stretches
+# that capped-resolution PNG across the (often much wider, often high-DPI)
+# container, which is what actually blurs the plot.
+#
+# Passing an explicit integer `width=` to st.pyplot bypasses that cap (the
+# int becomes the resize target directly) while still shrinking responsively
+# on narrow screens, per Streamlit's own width semantics. So we pick a dpi
+# that targets a roughly constant rendered pixel width per figure, and the
+# caller must pass that exact pixel width as `width=` (not "stretch") to
+# st.pyplot so the image is never downscaled below, nor CSS-upscaled above,
+# its native resolution.
 _RENDER_TARGET_PX = 2200
 _RENDER_MIN_DPI = 130
 _RENDER_MAX_DPI = 260
 
 
 def render_dpi(fig) -> int:
-    """Pick a savefig dpi that keeps `fig` sharp when stretched to fill the
-    browser without over-rendering (and thus over-allocating memory for)
-    already-wide figures.
+    """Pick a savefig dpi that keeps `fig` sharp without over-rendering (and
+    thus over-allocating memory for) already-wide figures.
     """
     width_in, _height_in = fig.get_size_inches()
     dpi = _RENDER_TARGET_PX / max(width_in, 1.0)
     return int(min(_RENDER_MAX_DPI, max(_RENDER_MIN_DPI, dpi)))
+
+
+def render_pixel_width(fig, dpi: int) -> int:
+    """Native rendered pixel width of `fig` at `dpi` - pass as st.pyplot's
+    `width=` so Streamlit neither downscales nor CSS-stretches the image.
+
+    savefig is called with bbox_inches="tight", which can grow the exported
+    canvas slightly beyond figsize * dpi (e.g. legends anchored just outside
+    the axes); a small buffer keeps that from tripping Streamlit's own
+    downscale-if-wider-than-`width` check.
+    """
+    width_in, _height_in = fig.get_size_inches()
+    return int(round(width_in * dpi * 1.1))
 
 _SEGMENT_RANK = {segment.casefold(): index for index, segment in enumerate(SEGMENT_ORDER)}
 _DIET_RANK = {diet.casefold(): index for index, diet in enumerate(DIET_ORDER)}
