@@ -22,6 +22,26 @@ from webapp.colors import (
 
 COLOR_SCHEME = load_color_scheme()
 
+# Streamlit rasterizes matplotlib figures to a fixed 200 dpi PNG before
+# stretching them to the container width (see st.pyplot's internal
+# marshall()). A hardcoded dpi looks soft on wide/high-DPI screens for our
+# narrower figures and wastes memory upscaling dpi on our widest ones, so we
+# pick a dpi per-figure that targets a roughly constant rendered pixel width
+# instead of a constant dpi.
+_RENDER_TARGET_PX = 2200
+_RENDER_MIN_DPI = 130
+_RENDER_MAX_DPI = 260
+
+
+def render_dpi(fig) -> int:
+    """Pick a savefig dpi that keeps `fig` sharp when stretched to fill the
+    browser without over-rendering (and thus over-allocating memory for)
+    already-wide figures.
+    """
+    width_in, _height_in = fig.get_size_inches()
+    dpi = _RENDER_TARGET_PX / max(width_in, 1.0)
+    return int(min(_RENDER_MAX_DPI, max(_RENDER_MIN_DPI, dpi)))
+
 _SEGMENT_RANK = {segment.casefold(): index for index, segment in enumerate(SEGMENT_ORDER)}
 _DIET_RANK = {diet.casefold(): index for index, diet in enumerate(DIET_ORDER)}
 

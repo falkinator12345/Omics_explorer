@@ -26,6 +26,7 @@ from webapp.plotting import (
     dotplot_faceted,
     heatmap_combined,
     heatmap_faceted,
+    render_dpi,
 )
 
 st.set_page_config(page_title="Omics Local Explorer", layout="wide")
@@ -717,7 +718,7 @@ def _render_plotting_page(sig_df: pd.DataFrame) -> None:
     else:
         fig = dotplot_faceted(expr_df, value_col="z_value", title="Faceted z-scored expression dotplot")
 
-    st.pyplot(fig, clear_figure=True)
+    st.pyplot(fig, clear_figure=True, width="stretch", dpi=render_dpi(fig))
 
     with st.expander("Expression data used for plotting"):
         st.dataframe(expr_df.sort_values(["dataset_label", "gene", "group_label"]).reset_index(drop=True), width='stretch')
@@ -799,7 +800,7 @@ def _render_overlap_page(sig_df: pd.DataFrame) -> None:
         log_scale=(scale_mode == "Log2"),
         intersection_order=summary["intersection"].tolist() if not summary.empty else None,
     )
-    st.pyplot(fig, clear_figure=True)
+    st.pyplot(fig, clear_figure=True, width="stretch", dpi=render_dpi(fig))
 
     st.subheader("Intersections")
     st.dataframe(summary.set_index("intersection_id"), width='stretch')
